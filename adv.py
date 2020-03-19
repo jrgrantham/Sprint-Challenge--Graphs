@@ -33,37 +33,51 @@ traversal_path = []
 graph = {}
 opposite_direction = {'n': 's', 's': 'n', 'w': 'e', 'e': 'w'}
 
+# set the current room to a 'key' in graph and match the directions of the visited room
 def set_exits(room):
+    # set room 'key' to empty object
     graph[room] = {}
+    # create a 'key' in the room for all directions and assign '?'
     for exit in player.current_room.get_exits():
         graph[room][exit] = '?'
 
+# return an array for the room of all unvisited directions
+def unexplored_exits(room):
+    unexplored = []
+    # loop over the directions for the current room
+    for exit in player.current_room.get_exits():
+        # if outstanding '?' then append to unexplored
+        if graph[room][exit] == '?':
+            unexplored.append(exit)
+    return unexplored
+
+# connect previous room to current room
 def connect_rooms(previous, current, direction):
+    # if room 'key' does not exist
     if not graph.get(current):
+        # create it
         set_exits(current)
+    # set the directions to connect to the 2 rooms in apposing directions
     graph[previous][direction] = current 
     graph[current][opposite_direction[direction]] = previous
 
-def unexplored_exits(room):
-    results = []
-    for exit in player.current_room.get_exits():
-        if graph[room][exit] == '?':
-            results.append(exit)
-    return results
-
+# set the initial room exits
 set_exits(player.current_room.id)
+# set the previous room to current room before first move
 previous_room = player.current_room.id
 
+# create a stack to store the current route
 route = Stack()
+# initialise the stack with the current route
 route.push(player.current_room)
 
-print('-' * 20)
-print(f'you are in room {player.current_room.id}')
-print(f'your options are {player.current_room.get_exits()}')
-print('-' * 20)
+# print('-' * 20)
+# print(f'you are in room {player.current_room.id}')
+# print(f'your options are {player.current_room.get_exits()}')
+# print('-' * 20)
 
+# while all rooms have not been visited
 while len(graph) < len(world.rooms):
-
     # choose random move, if none avaiable, move back
     if unexplored_exits(player.current_room.id):
         # set move to random choice
