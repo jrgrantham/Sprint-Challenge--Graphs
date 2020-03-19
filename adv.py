@@ -28,23 +28,21 @@ player = Player(world.starting_room)
 
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
+
 traversal_path = []
 graph = {}
+opposite_direction = {'n': 's', 's': 'n', 'w': 'e', 'e': 'w'}
 
 def set_exits(room):
-    if graph.get(room):
-        return
-    else:
-        graph[room] = {}
+    graph[room] = {}
     for exit in player.current_room.get_exits():
         graph[room][exit] = '?'
 
-pairs = {'n': 's', 's': 'n', 'w': 'e', 'e': 'w'}
-
 def connect_rooms(previous, current, direction):
-    set_exits(current)
+    if not graph.get(current):
+        set_exits(current)
     graph[previous][direction] = current 
-    graph[current][pairs[direction]] = previous
+    graph[current][opposite_direction[direction]] = previous
 
 def unexplored_exits(room):
     results = []
@@ -65,38 +63,32 @@ print(f'your options are {player.current_room.get_exits()}')
 print('-' * 20)
 
 while len(graph) < len(world.rooms):
+
+    # choose random move, if none avaiable, move back
     if unexplored_exits(player.current_room.id):
-        move = random.choice(unexplored_exits(player.current_room.id))
+        # set move to random choice
+        move = (unexplored_exits(player.current_room.id)).pop()
+        # add to stack
         route.push(move)
     else:
-        move = pairs[route.pop()]
+        # set move to backwards and remove from route
+        move = opposite_direction[route.pop()]
 
-
+    # move to next room
     player.travel(move)
+    # add move to route
     traversal_path.append(move)
+    # connect the 2 adjoining rooms
     connect_rooms(previous_room, player.current_room.id, move)
-    print('-' * 20)
-    print(f'you were in room {previous_room}')
-    print(f'you are now in room {player.current_room.id}')
-    print(f'your options are {player.current_room.get_exits()}')
-    print(f'rooms visited {graph[player.current_room.id]}')
-    print(f'unvisited {unexplored_exits(player.current_room.id)}')
-    print('-' * 20)
+    # print('-' * 20)
+    # print(f'you were in room {previous_room}')
+    # print(f'you are now in room {player.current_room.id}')
+    # print(f'your options are {player.current_room.get_exits()}')
+    # print(f'rooms visited {graph[player.current_room.id]}')
+    # print(f'unvisited {unexplored_exits(player.current_room.id)}')
+    # print('-' * 20)
+    # set the previous room to current room for next move
     previous_room = player.current_room.id
-
-# while len(graph) < len(world.rooms):
-#     move = random.choice(unexplored_exits(player.current_room.id))
-#     player.travel(move)
-#     traversal_path.append(move)
-#     connect_rooms(previous_room, player.current_room.id, move)
-#     print('-' * 20)
-#     print(f'you were in room {previous_room}')
-#     print(f'you are now in room {player.current_room.id}')
-#     print(f'your options are {player.current_room.get_exits()}')
-#     print(f'rooms visited {graph[player.current_room.id]}')
-#     print(f'unvisited {unexplored_exits(player.current_room.id)}')
-#     print('-' * 20)
-#     previous_room = player.current_room.id
 
 print(graph)
 
