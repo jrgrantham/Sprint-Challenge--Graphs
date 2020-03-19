@@ -1,7 +1,7 @@
 from room import Room
 from player import Player
 from world import World
-
+import copy
 import random
 from ast import literal_eval
 
@@ -29,21 +29,36 @@ player = Player(world.starting_room)
 # traversal_path = ['n', 'n']
 traversal_path = []
 
-def connect_rooms(previous, current, direction):
-    pairs = {'n': 's', 's': 'n', 'w': 'e', 'e': 'w'}
-    graph[previous][pairs[direction]] = current 
-    graph[current][direction] = previous
+empty_directions = {'n': '?', 's': '?', 'w': '?', 'e': '?'}
 
 graph = {}
+for i in range(len(world.rooms)):
+    graph[i] = copy.copy(empty_directions)
+
+print(graph)
+
+def connect_rooms(previous, current, direction):
+    pairs = {'n': 's', 's': 'n', 'w': 'e', 'e': 'w'}
+
+    print(previous)
+    print(current)
+    print(direction)
+    print(pairs[direction])
+    print(graph[previous])
+    print(graph[current])
+    graph[previous][direction] = current 
+    graph[current][pairs[direction]] = previous
+    print(graph[previous])
+    print(graph[current])
 
 previous_room = player.current_room.id
 
-print(f'\nthe world contains {len(world.rooms)} rooms')
 print (f'you are in room {player.current_room.id}')
-
 player.travel('n')
-# connect_rooms(previous_room, player.current_room.id, 'n')
-print(f'you are in room {player.current_room.id}')
+print(f'you were in room {previous_room}')
+print(f'you are now in room {player.current_room.id}')
+
+connect_rooms(previous_room, player.current_room.id, 'n')
 
 print(graph)
 
