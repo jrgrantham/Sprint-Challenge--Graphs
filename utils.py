@@ -10,8 +10,3 @@ class Queue():
             return None
     def size(self):
         return len(self.queue)
-
-def connect_rooms(previous, current, direction)
-    pairs = {'n': 's', 's': 'n', 'w': 'e', 'e': 'w'}
-    previous[direction] = current
-    current[side_pairs[direction]] = previous

@@ -4,6 +4,7 @@ from world import World
 import copy
 import random
 from ast import literal_eval
+from utils import Queue
 
 # Load world
 world = World()
@@ -28,40 +29,42 @@ player = Player(world.starting_room)
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
 traversal_path = []
-
-empty_directions = {'n': '?', 's': '?', 'w': '?', 'e': '?'}
-
 graph = {}
-for i in range(len(world.rooms)):
-    graph[i] = copy.copy(empty_directions)
 
-print(graph)
+def set_exits(current):
+    if not graph.get(current):
+        graph[current] = {}
+    else:
+        return
+    for exit in player.current_room.get_exits():
+        graph[current][exit] = '?'
 
 def connect_rooms(previous, current, direction):
+    set_exits(current)
     pairs = {'n': 's', 's': 'n', 'w': 'e', 'e': 'w'}
-
-    print(previous)
-    print(current)
-    print(direction)
-    print(pairs[direction])
-    print(graph[previous])
-    print(graph[current])
     graph[previous][direction] = current 
     graph[current][pairs[direction]] = previous
-    print(graph[previous])
-    print(graph[current])
 
+set_exits(player.current_room.id)
 previous_room = player.current_room.id
 
-print (f'you are in room {player.current_room.id}')
-player.travel('n')
-print(f'you were in room {previous_room}')
-print(f'you are now in room {player.current_room.id}')
+print('-' * 20)
+print(f'you are in room {player.current_room.id}')
+print(f'your options are {player.current_room.get_exits()}')
+print('-' * 20)
 
-connect_rooms(previous_room, player.current_room.id, 'n')
+while len(graph) < len(world.rooms):
+    print('-' * 20)
+    player.travel('n')
+    print(f'you were in room {previous_room}')
+    print(f'you are now in room {player.current_room.id}')
+    print(f'your options are {player.current_room.get_exits()}')
+    traversal_path.append('n')
+    connect_rooms(previous_room, player.current_room.id, 'n')
+    previous_room = player.current_room.id
+    print('-' * 20)
 
 print(graph)
-
 
 # TRAVERSAL TEST
 visited_rooms = set()
